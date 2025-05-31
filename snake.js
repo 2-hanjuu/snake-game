@@ -23,7 +23,7 @@ function getRandomInt(min, max) {
 
 function gameLoop() {
   requestAnimationFrame(gameLoop);
-  if (++count < 4) return;
+  if (++count < 8) return; // 속도를 0.5배 느리게
   count = 0;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -71,6 +71,10 @@ function gameLoop() {
 }
 
 document.addEventListener('keydown', function(e) {
+  // 방향키 입력 시 스크롤 방지
+  if (["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(e.key)) {
+    e.preventDefault();
+  }
   if (e.key === 'ArrowLeft' && snake.dx === 0) {
     snake.dx = -grid;
     snake.dy = 0;

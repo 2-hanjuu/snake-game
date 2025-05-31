@@ -14,16 +14,27 @@ let snake = {
   cells: [],
   maxCells: 4
 };
-let apple = {
-  x: 320,
-  y: 320
-};
+// 사과와 폭탄을 배열로 관리
+let apples = [];
+let bombs = [];
 
-// 폭탄(먹으면 길이가 줄어듦)
-let bomb = {
-  x: 160,
-  y: 160
-};
+function randomizeFruits() {
+  // 사과와 폭탄 개수(1~2개 랜덤)
+  const fruitCount = getRandomInt(1, 3);
+  apples = [];
+  bombs = [];
+  for (let i = 0; i < fruitCount; i++) {
+    apples.push({
+      x: getRandomInt(0, canvas.width / grid) * grid,
+      y: getRandomInt(0, canvas.height / grid) * grid
+    });
+    bombs.push({
+      x: getRandomInt(0, canvas.width / grid) * grid,
+      y: getRandomInt(0, canvas.height / grid) * grid
+    });
+  }
+}
+
 let score = 0;
 
 function getRandomInt(min, max) {
@@ -47,31 +58,44 @@ function gameLoop() {
   snake.cells.unshift({x: snake.x, y: snake.y});
   if (snake.cells.length > snake.maxCells) snake.cells.pop();
 
-  // 사과 그리기
+  // 사과 그리기 (여러 개)
   ctx.fillStyle = '#e53935';
-  ctx.fillRect(apple.x, apple.y, grid-2, grid-2);
+  apples.forEach(apple => {
+    ctx.fillRect(apple.x, apple.y, grid-2, grid-2);
+  });
 
-  // 폭탄 그리기
+  // 폭탄 그리기 (여러 개)
   ctx.fillStyle = '#ffd600';
-  ctx.fillRect(bomb.x, bomb.y, grid-2, grid-2);
+  bombs.forEach(bomb => {
+    ctx.fillRect(bomb.x, bomb.y, grid-2, grid-2);
+  });
 
   ctx.fillStyle = '#4caf50';
   snake.cells.forEach((cell, index) => {
     ctx.fillRect(cell.x, cell.y, grid-2, grid-2);
-    if (cell.x === apple.x && cell.y === apple.y) {
-      snake.maxCells++;
-      score++;
-      // 사과 위치 재설정 (현재 캔버스 크기에 맞게)
-      apple.x = getRandomInt(0, canvas.width / grid) * grid;
-      apple.y = getRandomInt(0, canvas.height / grid) * grid;
-    }
-    // 폭탄 먹었을 때
-    if (cell.x === bomb.x && cell.y === bomb.y) {
-      if (snake.maxCells > 1) snake.maxCells--;
-      // 폭탄 위치 재설정 (현재 캔버스 크기에 맞게)
-      bomb.x = getRandomInt(0, canvas.width / grid) * grid;
-      bomb.y = getRandomInt(0, canvas.height / grid) * grid;
-    }
+    // 여러 사과 체크
+    apples.forEach((apple, appleIdx) => {
+      if (cell.x === apple.x && cell.y === apple.y) {
+        snake.maxCells++;
+        score++;
+        // 사과 위치 재설정
+        apples[appleIdx].x = getRandomInt(0, canvas.width / grid) * grid;
+        apples[appleIdx].y = getRandomInt(0, canvas.height / grid) * grid;
+        // 사과/폭탄 개수도 다시 랜덤화
+        randomizeFruits();
+      }
+    });
+    // 여러 폭탄 체크
+    bombs.forEach((bomb, bombIdx) => {
+      if (cell.x === bomb.x && cell.y === bomb.y) {
+        if (snake.maxCells > 1) snake.maxCells--;
+        // 폭탄 위치 재설정
+        bombs[bombIdx].x = getRandomInt(0, canvas.width / grid) * grid;
+        bombs[bombIdx].y = getRandomInt(0, canvas.height / grid) * grid;
+        // 사과/폭탄 개수도 다시 랜덤화
+        randomizeFruits();
+      }
+    });
     for (let i = index + 1; i < snake.cells.length; i++) {
       if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
         snake.x = 160;
@@ -81,11 +105,8 @@ function gameLoop() {
         snake.dx = grid;
         snake.dy = 0;
         score = 0;
-        // 사과, 폭탄 위치 모두 재설정 (현재 캔버스 크기에 맞게)
-        apple.x = getRandomInt(0, canvas.width / grid) * grid;
-        apple.y = getRandomInt(0, canvas.height / grid) * grid;
-        bomb.x = getRandomInt(0, canvas.width / grid) * grid;
-        bomb.y = getRandomInt(0, canvas.height / grid) * grid;
+        // 사과, 폭탄 모두 랜덤화
+        randomizeFruits();
       }
     }
   });
@@ -115,4 +136,6 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// 게임 시작 시 과일/폭탄 랜덤화
+randomizeFruits();
 gameLoop();

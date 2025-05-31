@@ -83,6 +83,8 @@ function gameLoop() {
         apples[appleIdx].y = getRandomInt(0, canvas.height / grid) * grid;
         // 사과/폭탄 개수도 다시 랜덤화
         randomizeFruits();
+        // 길이 1 증가
+        snake.maxCells++;
       }
     });
     // 여러 폭탄 체크

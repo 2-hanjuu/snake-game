@@ -1,17 +1,11 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-// 캔버스를 브라우저 창 크기에 맞게 조절
-function resizeCanvas() {
-  // grid 단위로 딱 맞게 조정
-  canvas.width = Math.floor(window.innerWidth / grid) * grid;
-  canvas.height = Math.floor(window.innerHeight / grid) * grid;
-}
-
+// 캔버스 크기를 최초 버전의 2배(800x800)로 고정
 const grid = 20;
 let count = 0;
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+canvas.width = 800;
+canvas.height = 800;
 let snake = {
   x: 160,
   y: 160,
